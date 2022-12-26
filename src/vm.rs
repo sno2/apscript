@@ -392,6 +392,22 @@ impl<'a> VM<'a> {
                         n -= 1;
                     }
                 }
+                Stmt::RepeatUntil { cond, scope } => loop {
+                    let val = tee!(self.eval_expr(cond));
+
+                    let Value::Bool(b) = val else {
+						fail!(format!("{val:?} is not a boolean"), cond.span());
+					};
+
+                    if b {
+                        break;
+                    }
+
+                    let val = tee!(self.eval_scope(scope));
+                    let Value::Void = val else {
+						return val;
+					};
+                },
                 Stmt::For {
                     alias: _,
                     array,

@@ -170,6 +170,10 @@ pub enum Stmt {
         n: Box<Expr>,
         scope: Box<[Stmt]>,
     },
+    RepeatUntil {
+        cond: Box<Expr>,
+        scope: Box<[Stmt]>,
+    },
     For {
         alias: Span,
         array: Box<Expr>,

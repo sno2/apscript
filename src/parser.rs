@@ -367,8 +367,24 @@ impl<'a, T: Copy> Parser<'a, T> {
 
                     nodes.push(ret_stmt);
                 }
-                Token::Keyword(Keyword::Repeat) => {
+                Token::Keyword(Keyword::Repeat) => 'blk: {
                     self.lex.next();
+
+                    if let Token::Keyword(Keyword::Until) = self.lex.token {
+                        self.lex.next();
+                        self.eat(Token::LeftParen)?;
+                        let cond = self.parse_expr(0)?;
+                        self.eat(Token::RightParen)?;
+                        self.eat(Token::LeftBrace)?;
+                        let scope = self.parse_scope(is_global_scope)?;
+                        self.eat(Token::RightBrace)?;
+                        nodes.push(Stmt::RepeatUntil {
+                            cond: Box::new(cond),
+                            scope,
+                        });
+                        break 'blk;
+                    }
+
                     let n = self.parse_expr(0)?;
                     self.eat(Token::Keyword(Keyword::Times))?;
                     self.eat(Token::LeftBrace)?;
