@@ -37,11 +37,11 @@ pub fn inject(vm: &mut VM) {
 fn display_helper(stdout: &mut StdoutLock, args: &[Value]) -> Value {
     let mut iter = args.into_iter();
     if let Some(arg0) = iter.next() {
-        let Ok(_) = write!(stdout, "{:?}", arg0) else {
+        let Ok(_) = write!(stdout, "{}", arg0) else {
 			fail!("failed to write to stdout", BUILTIN);
 		};
         for arg in iter {
-            let Ok(_) = write!(stdout, " {:?}", arg) else {
+            let Ok(_) = write!(stdout, " {}", arg) else {
 				fail!("failed to write to stdout", BUILTIN);
 			};
         }

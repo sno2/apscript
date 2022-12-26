@@ -1,4 +1,7 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::{
+    collections::HashMap,
+    fmt::{Debug, Display},
+};
 
 use gc::{Finalize, Gc, GcCell, Trace};
 use rand::rngs::ThreadRng;
@@ -36,7 +39,7 @@ unsafe impl Trace for Exception {
     fn finalize_glue(&self) {}
 }
 
-impl Debug for Value {
+impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Void => write!(f, "<void>"),
@@ -67,6 +70,15 @@ impl Debug for Value {
                 write!(f, "]")
             }
             Self::Builtin(_) => write!(f, "<builtin>"),
+        }
+    }
+}
+
+impl Debug for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::String(s) => write!(f, "{:?}", s),
+            _ => write!(f, "{}", self),
         }
     }
 }
