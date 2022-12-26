@@ -34,12 +34,14 @@ macro_rules! fail {
         return Value::Exception(Box::new(crate::vm::Exception {
             message: $msg.into(),
             span: crate::ast::Span { start: 0, end: 0 },
+            stack: Vec::new(),
         }));
     }};
     ($msg: expr, $span: expr) => {{
         return Value::Exception(Box::new(crate::vm::Exception {
             message: $msg.into(),
             span: $span,
+            stack: Vec::new(),
         }));
     }};
 }
@@ -84,6 +86,7 @@ fn main() {
         let writer = StandardStream::stderr(ColorChoice::Always);
         let config = codespan_reporting::term::Config::default();
         let mut writer = writer.lock();
+
         term::emit(
             &mut writer,
             &config,
@@ -93,5 +96,17 @@ fn main() {
                 .with_labels(vec![Label::primary(fid, e.span)]),
         )
         .unwrap();
+
+        for itm in e.stack.iter() {
+            term::emit(
+                &mut writer,
+                &config,
+                &files,
+                &Diagnostic::note()
+                    .with_message("called here")
+                    .with_labels(vec![Label::primary(fid, *itm)]),
+            )
+            .unwrap();
+        }
     }
 }

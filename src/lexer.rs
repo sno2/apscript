@@ -78,6 +78,7 @@ impl AsRef<str> for Token {
             Self::Keyword(Keyword::For) => "`FOR`",
             Self::Keyword(Keyword::Each) => "`EACH`",
             Self::Keyword(Keyword::In) => "`IN`",
+            Self::Keyword(Keyword::Procedure) => "`PROCEDURE`",
         }
     }
 }
@@ -115,6 +116,7 @@ pub enum Keyword {
     For,
     Each,
     In,
+    Procedure,
 }
 
 pub static KEYWORDS: phf::Map<&'static str, Token> = phf_map! {
@@ -146,6 +148,8 @@ pub static KEYWORDS: phf::Map<&'static str, Token> = phf_map! {
     "each" => Token::Keyword(Keyword::Each),
     "IN" => Token::Keyword(Keyword::In),
     "in" => Token::Keyword(Keyword::In),
+    "PROCEDURE" => Token::Keyword(Keyword::Procedure),
+    "procedure" => Token::Keyword(Keyword::Procedure),
 };
 
 #[derive(Debug)]

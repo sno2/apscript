@@ -12,7 +12,7 @@ impl Into<std::ops::Range<usize>> for Span {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Void,
     True {
@@ -104,7 +104,7 @@ impl Node for Expr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BinaryOpKind {
     Add,
     Sub,
@@ -142,14 +142,14 @@ impl From<Token> for BinaryOpKind {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum UnaryOpKind {
     Pos,
     Neg,
     Not,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Stmt {
     Return {
         start: u32,
@@ -166,6 +166,7 @@ pub enum Stmt {
         else_ifs: Box<[ElseIf]>,
         els: Option<Box<[Stmt]>>,
     },
+    Procedure(Procedure),
     RepeatN {
         n: Box<Expr>,
         scope: Box<[Stmt]>,
@@ -179,6 +180,20 @@ pub enum Stmt {
         array: Box<Expr>,
         scope: Box<[Stmt]>,
     },
+}
+
+#[derive(Debug, gc::Finalize, Clone)]
+pub struct Procedure {
+    pub name: Span,
+    pub params: Box<[Span]>,
+    pub scope: Box<[Stmt]>,
+}
+
+unsafe impl gc::Trace for Procedure {
+    unsafe fn trace(&self) {}
+    unsafe fn root(&self) {}
+    unsafe fn unroot(&self) {}
+    fn finalize_glue(&self) {}
 }
 
 impl Node for Stmt {
@@ -201,7 +216,7 @@ impl Node for Stmt {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ElseIf {
     pub cond: Expr,
     pub scope: Box<[Stmt]>,

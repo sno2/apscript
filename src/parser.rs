@@ -1,7 +1,7 @@
 use codespan_reporting::diagnostic::{Diagnostic, Label};
 
 use crate::{
-    ast::{ElseIf, Expr, Node, Span, Stmt, UnaryOpKind},
+    ast::{ElseIf, Expr, Node, Procedure, Span, Stmt, UnaryOpKind},
     lexer::{Keyword, Lexer, Token},
 };
 
@@ -336,6 +336,20 @@ impl<'a, T: Copy> Parser<'a, T> {
                         else_ifs: else_ifs.into_boxed_slice(),
                         els,
                     });
+                }
+                Token::Keyword(Keyword::Procedure) => {
+                    self.lex.next();
+                    let name = self.eat(Token::Identifier)?;
+                    self.eat(Token::LeftParen)?;
+                    self.eat(Token::RightParen)?;
+                    self.eat(Token::LeftBrace)?;
+                    let scope = self.parse_scope(false)?;
+                    self.eat(Token::RightBrace)?;
+                    nodes.push(Stmt::Procedure(Procedure {
+                        name,
+                        params: Box::new([]),
+                        scope,
+                    }));
                 }
                 Token::Keyword(Keyword::Return) => {
                     let start = self.lex.start as u32;

@@ -1,13 +1,14 @@
 use std::{
     collections::HashMap,
     fmt::{Debug, Display},
+    rc::Rc,
 };
 
 use gc::{Finalize, Gc, GcCell, Trace};
 use rand::rngs::ThreadRng;
 
 use crate::{
-    ast::{BinaryOpKind, Expr, Node, Span, Stmt, UnaryOpKind},
+    ast::{BinaryOpKind, Expr, Node, Procedure, Span, Stmt, UnaryOpKind},
     fail, tee,
 };
 
@@ -18,7 +19,10 @@ pub enum Value {
     Number(f32),
     String(Gc<String>),
     Array(Gc<GcCell<Array>>),
+    #[unsafe_ignore_trace]
     Builtin(Builtin),
+    #[unsafe_ignore_trace]
+    Procedure(Rc<Procedure>),
     #[unsafe_ignore_trace]
     Exception(Box<Exception>),
 }
@@ -41,6 +45,7 @@ impl PartialEq for Value {
 pub struct Exception {
     pub message: String,
     pub span: Span,
+    pub stack: Vec<Span>,
 }
 
 unsafe impl Trace for Exception {
@@ -59,6 +64,7 @@ impl Display for Value {
             Self::Void => write!(f, "<void>"),
             Self::Bool(b) => write!(f, "{}", if *b { "true" } else { "false" }),
             Self::Number(n) => write!(f, "{}", n),
+            Self::Procedure(_) => write!(f, "<procedure>"),
             Self::String(s) => {
                 let mut iter = s.chars();
                 while let Some(c) = iter.next() {
@@ -284,6 +290,19 @@ impl<'a> VM<'a> {
             }
             Expr::FnCall { calle, args, span } => 'blk: {
                 let v = tee!(self.eval_expr(calle));
+
+                if let Value::Procedure(proc) = &v {
+                    let res = self.eval_scope(&proc.scope);
+
+                    if let Value::Exception(e) = &res {
+                        let mut e = e.clone();
+                        e.stack.push(*span);
+                        break 'blk Value::Exception(e);
+                    };
+
+                    break 'blk res;
+                }
+
                 if let Value::Builtin(calle) = &v {
                     let mut oargs = Vec::with_capacity(args.len());
 
@@ -297,6 +316,7 @@ impl<'a> VM<'a> {
                         Value::Exception(Box::new(Exception {
                             message: e.message.clone(),
                             span: *span,
+                            stack: Vec::new(),
                         }))
                     } else {
                         res
@@ -315,8 +335,14 @@ impl<'a> VM<'a> {
                 Stmt::VarAssign { name, value } => {
                     let v = tee!(self.eval_expr(value));
                     self.scope
-                        .insert(&self.source[Into::<std::ops::Range<_>>::into(*name)], v)
-                        .finalize();
+                        .insert(&self.source[Into::<std::ops::Range<_>>::into(*name)], v);
+                }
+                Stmt::Procedure(proc) => {
+                    // TODO: this clone is wildly inefficient
+                    self.scope.insert(
+                        &self.source[Into::<std::ops::Range<_>>::into(proc.name)],
+                        Value::Procedure(Rc::new(proc.clone())),
+                    );
                 }
                 Stmt::Return { value, .. } => return self.eval_expr(value),
                 Stmt::If {
@@ -325,8 +351,9 @@ impl<'a> VM<'a> {
                     else_ifs,
                     els,
                 } => 'blk: {
-                    let Value::Bool(b) = tee!(self.eval_expr(cond)) else {
-						panic!();
+                    let c1 = tee!(self.eval_expr(cond));
+                    let Value::Bool(b) = c1 else {
+						fail!(format!("{c1:?} is not a boolean"), cond.span());
 					};
 
                     if b {
