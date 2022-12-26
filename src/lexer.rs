@@ -237,6 +237,14 @@ impl<'a> Lexer<'a> {
 
                     continue 'main;
                 }
+                Some(b'#') => loop {
+                    self.index += 1;
+                    if let Some(b'\n') = self.buffer.get(self.index) {
+                        self.index += 1;
+                        self.has_newline_before = true;
+                        continue 'main;
+                    }
+                },
                 Some(b'(') => {
                     self.index += 1;
                     self.token = Token::LeftParen;
