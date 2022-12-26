@@ -85,11 +85,12 @@ impl AsRef<str> for Token {
 impl Token {
     pub fn lbp(self) -> u8 {
         match self {
-            Self::LeftParen | Self::LeftBrack => 70,
-            // Unary ops are 60
-            Self::Mul | Self::Div | Self::Keyword(Keyword::Mod) => 50,
-            Self::Add | Self::Sub => 40,
-            Self::Less | Self::LessEqual | Self::Greater | Self::GreaterEqual => 30,
+            Self::LeftParen | Self::LeftBrack => 80,
+            // Unary ops are 70
+            Self::Mul | Self::Div | Self::Keyword(Keyword::Mod) => 60,
+            Self::Add | Self::Sub => 50,
+            Self::Less | Self::LessEqual | Self::Greater | Self::GreaterEqual => 40,
+            Self::Equal | Self::NotEqual => 30,
             Self::Keyword(Keyword::And) => 20,
             Self::Keyword(Keyword::Or) => 10,
             _ => 0,

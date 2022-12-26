@@ -23,6 +23,20 @@ pub enum Value {
     Exception(Box<Exception>),
 }
 
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Bool(l0), Self::Bool(r0)) => l0 == r0,
+            (Self::Number(l0), Self::Number(r0)) => l0 == r0,
+            (Self::String(l0), Self::String(r0)) => l0 == r0,
+            (Self::Array(l0), Self::Array(r0)) => l0 == r0,
+            (Self::Builtin(l0), Self::Builtin(r0)) => l0.0 as usize == r0.0 as usize,
+            (Self::Exception(_), Self::Exception(_)) => false,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Debug, Finalize, Clone)]
 pub struct Exception {
     pub message: String,
@@ -104,7 +118,7 @@ impl Debug for Builtin {
     }
 }
 
-#[derive(Debug, Finalize, Trace, Clone)]
+#[derive(PartialEq, Debug, Finalize, Trace, Clone)]
 pub struct Array {
     pub items: Vec<Value>,
 }
@@ -212,6 +226,18 @@ impl<'a> VM<'a> {
 
                     Value::Bool(b2)
                 }
+                BinaryOpKind::Equal => {
+                    let lhs_value = tee!(self.eval_expr(lhs));
+                    let rhs_value = tee!(self.eval_expr(rhs));
+
+                    Value::Bool(lhs_value == rhs_value)
+                }
+                BinaryOpKind::NotEqual => {
+                    let lhs_value = tee!(self.eval_expr(lhs));
+                    let rhs_value = tee!(self.eval_expr(rhs));
+
+                    Value::Bool(lhs_value != rhs_value)
+                }
                 BinaryOpKind::Add
                 | BinaryOpKind::Sub
                 | BinaryOpKind::Mul
@@ -245,7 +271,6 @@ impl<'a> VM<'a> {
                         _ => unreachable!(),
                     }
                 }
-                _ => panic!(),
             },
             Expr::Paren { value, .. } => tee!(self.eval_expr(value)),
             Expr::ArrayLiteral { values, .. } => {

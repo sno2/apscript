@@ -104,7 +104,7 @@ impl<'a, T: Copy> Parser<'a, T> {
             Token::Keyword(Keyword::Not) => {
                 let start = self.lex.start as u32;
                 self.lex.next();
-                let e = self.parse_expr(60)?;
+                let e = self.parse_expr(70)?;
                 Expr::UnaryOp {
                     span: Span {
                         start,
@@ -117,7 +117,7 @@ impl<'a, T: Copy> Parser<'a, T> {
             Token::Add => {
                 let start = self.lex.start as u32;
                 self.lex.next();
-                let e = self.parse_expr(60)?;
+                let e = self.parse_expr(70)?;
                 Expr::UnaryOp {
                     span: Span {
                         start,
@@ -130,7 +130,7 @@ impl<'a, T: Copy> Parser<'a, T> {
             Token::Sub => {
                 let start = self.lex.start as u32;
                 self.lex.next();
-                let e = self.parse_expr(60)?;
+                let e = self.parse_expr(70)?;
                 Expr::UnaryOp {
                     span: Span {
                         start,
