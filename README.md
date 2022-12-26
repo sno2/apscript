@@ -169,6 +169,23 @@ REPEAT 5 TIMES {
 | foo (initial) | `[]`              |
 | foo (final)   | `[1, 1, 1, 1, 1]` |
 
+Another form of loop is the `REPEAT UNTIL` loop which will run the associated
+block until the condition is true. This can be especially useful when you are
+validating input from a user.
+
+```
+# Build a list of five 10's
+list <- []
+REPEAT UNTIL (LENGTH(list) = 5) {
+	APPEND(list, 10)
+}
+```
+
+| State          |                        |
+| -------------- | ---------------------- |
+| list (initial) | `[]`                   |
+| list (final)   | `[10, 10, 10, 10, 10]` |
+
 ### I/O
 
 I/O stands for input/output, or methods that the outside parts can interact with
