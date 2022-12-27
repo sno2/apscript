@@ -1,0 +1,38 @@
+[package]
+name = "aps_core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["js"]
+# default = ["rand"]
+js = ["wasm-bindgen", "web-sys", "js-sys", "serde", "serde-wasm-bindgen", "codespan-reporting/serialization"]
+
+[dependencies]
+gc = { version = "0.4.1", features = ["derive"] }
+phf = { version = "0.11.1", default-features = false, features = ["macros"] }
+rand = { version = "0.8.5", optional = true }
+codespan-reporting = "0.11.1"
+wasm-bindgen = { version = "0.2.83", optional = true }
+serde = { version = "1.0.152", optional = true, features = ["derive"] }
+serde-wasm-bindgen = { version = "0.4.5", optional = true }
+
+[dependencies.web-sys]
+version = "0.3.60"
+optional = true
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+  'console',
+]
+
+[dependencies.js-sys]
+version = "0.3.60"
+optional = true
+features = []

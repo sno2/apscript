@@ -9,9 +9,12 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 - Beautiful error logging for parsing and runtime errors (using `codespan-reporting`)
 - Hackable virtual machine design
 
-### Error handling
+### Playground
 
-The parser is built for accomodating for many syntax errors:
+The interpreter is patched along with a custom interpreter using Monaco, the
+text editor that powers VS Code, and term.js, an emulated terminal for the web.
+The interpreter supports live parse checking and runtime error diagnostics in
+the terminal and integrated into the editor.
 
 ## Language Guide
 

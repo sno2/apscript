@@ -6,57 +6,15 @@ use codespan_reporting::{
         termcolor::{ColorChoice, StandardStream},
     },
 };
-use parser::Parser;
 
-use crate::vm::{Value, VM};
-
-mod ast;
-mod lexer;
-mod parser;
-mod stdlib;
-mod vm;
-
-#[macro_export]
-macro_rules! tee {
-    ($e: expr) => {{
-        let value = $e;
-        if let Value::Exception(_) = value {
-            return value;
-        } else {
-            value
-        }
-    }};
-}
-
-#[macro_export]
-macro_rules! fail {
-    ($msg: expr, BUILTIN) => {{
-        return Value::Exception(Box::new(crate::vm::Exception {
-            message: $msg.into(),
-            span: crate::ast::Span { start: 0, end: 0 },
-            stack: Vec::new(),
-        }));
-    }};
-    ($msg: expr, $span: expr) => {{
-        return Value::Exception(Box::new(crate::vm::Exception {
-            message: $msg.into(),
-            span: $span,
-            stack: Vec::new(),
-        }));
-    }};
-}
+use aps_core::{
+    parser::Parser,
+    stdlib,
+    vm::{Value, VM},
+};
 
 fn main() {
     let input = std::fs::read_to_string("foo.aps").unwrap();
-    // let mut lex = Lexer::new(input.as_bytes());
-
-    // loop {
-    //     lex.next();
-    //     println!("{:4} {:?}", lex.start, lex.token);
-    //     if lex.token == Token::EOF {
-    //         break;
-    //     }
-    // }
 
     let mut files = SimpleFiles::new();
     let fid = files.add("foo.aps", &input);

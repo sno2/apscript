@@ -5,6 +5,7 @@ use std::{
 };
 
 use gc::{Finalize, Gc, GcCell, Trace};
+#[cfg(not(feature = "js"))]
 use rand::rngs::ThreadRng;
 
 use crate::{
@@ -70,6 +71,7 @@ impl Display for Value {
                 while let Some(c) = iter.next() {
                     if c == '\\' {
                         iter.next();
+                        continue;
                     }
                     write!(f, "{c}")?;
                 }
@@ -132,6 +134,8 @@ pub struct Array {
 pub struct VM<'a> {
     pub source: &'a str,
     pub scope: HashMap<&'a str, Value>,
+
+    #[cfg(not(feature = "js"))]
     pub rng: Option<ThreadRng>,
 }
 
@@ -140,6 +144,7 @@ impl<'a> VM<'a> {
         Self {
             source,
             scope: HashMap::new(),
+            #[cfg(not(feature = "js"))]
             rng: None,
         }
     }

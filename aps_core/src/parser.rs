@@ -5,6 +5,7 @@ use crate::{
     lexer::{Keyword, Lexer, Token},
 };
 
+#[derive(Debug)]
 pub struct Parser<'a, T: Copy> {
     pub lex: Lexer<'a>,
     pub fid: T,
@@ -338,13 +339,27 @@ impl<'a, T: Copy> Parser<'a, T> {
                     });
                 }
                 Token::Keyword(Keyword::Procedure) => {
+                    let start = self.lex.start as u32;
                     self.lex.next();
                     let name = self.eat(Token::Identifier)?;
                     self.eat(Token::LeftParen)?;
                     self.eat(Token::RightParen)?;
                     self.eat(Token::LeftBrace)?;
                     let scope = self.parse_scope(false)?;
+                    let end = self.lex.index as u32;
                     self.eat(Token::RightBrace)?;
+
+                    if !is_global_scope {
+                        self.diagnostics.push(
+                            Diagnostic::error()
+                                .with_message(format!(
+                                    "PROCEDUREs cannot be outside of the global scope",
+                                ))
+                                .with_labels(vec![Label::primary(self.fid, Span { start, end })
+                                    .with_message(format!("PROCEDURE not in the global scope"))]),
+                        );
+                    }
+
                     nodes.push(Stmt::Procedure(Procedure {
                         name,
                         params: Box::new([]),
@@ -354,7 +369,7 @@ impl<'a, T: Copy> Parser<'a, T> {
                 Token::Keyword(Keyword::Return) => {
                     let start = self.lex.start as u32;
                     self.lex.next();
-                    let ret_stmt = if self.lex.has_newline_before {
+                    let ret_stmt = if self.lex.has_newline_before || self.lex.token == Token::EOF {
                         Stmt::Return {
                             start,
                             value: Expr::Void,

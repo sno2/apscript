@@ -1,5 +1,11 @@
 # Contributing Guide
 
+## Building WASM library
+
+```bash
+$ wasm-pack build aps_core --target web --out-dir=../editor/lib
+```
+
 ## Parser
 
 - When adding any new calls to functions that return `Value`, make sure you wrap

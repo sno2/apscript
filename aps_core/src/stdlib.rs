@@ -1,6 +1,11 @@
+#[cfg(feature = "js")]
+use std::fmt::Write as WriteFmt;
+#[cfg(not(feature = "js"))]
 use std::io::{StdoutLock, Write};
 
+#[cfg(not(feature = "js"))]
 use gc::Gc;
+#[cfg(not(feature = "js"))]
 use rand::Rng;
 
 use crate::{
@@ -12,7 +17,9 @@ pub fn inject(vm: &mut VM) {
     let builtins = [
         ("DISPLAY", display as BuiltinPtr),
         ("display", display),
+        #[cfg(not(feature = "js"))]
         ("INPUT", input),
+        #[cfg(not(feature = "js"))]
         ("input", input),
         ("RANDOM", random),
         ("random", random),
@@ -34,6 +41,7 @@ pub fn inject(vm: &mut VM) {
     );
 }
 
+#[cfg(not(feature = "js"))]
 fn display_helper(stdout: &mut StdoutLock, args: &[Value]) -> Value {
     let mut iter = args.into_iter();
     if let Some(arg0) = iter.next() {
@@ -44,6 +52,18 @@ fn display_helper(stdout: &mut StdoutLock, args: &[Value]) -> Value {
             let Ok(_) = write!(stdout, " {}", arg) else {
 				fail!("failed to write to stdout", BUILTIN);
 			};
+        }
+    }
+    Value::Void
+}
+
+#[cfg(feature = "js")]
+fn display_helper(out: &mut String, args: &[Value]) -> Value {
+    let mut iter = args.into_iter();
+    if let Some(arg0) = iter.next() {
+        write!(out, "{}", arg0).unwrap();
+        for arg in iter {
+            write!(out, " {}", arg).unwrap();
         }
     }
     Value::Void
@@ -62,6 +82,7 @@ fn validate_index(idx: f32, out: &mut usize) -> Value {
     Value::Void
 }
 
+#[cfg(not(feature = "js"))]
 fn display(_: &mut VM, args: &[Value]) -> Value {
     let mut stdout = std::io::stdout().lock();
     _ = tee!(display_helper(&mut stdout, args));
@@ -74,6 +95,15 @@ fn display(_: &mut VM, args: &[Value]) -> Value {
     Value::Void
 }
 
+#[cfg(feature = "js")]
+fn display(_: &mut VM, args: &[Value]) -> Value {
+    let mut out = String::new();
+    _ = tee!(display_helper(&mut out, args));
+    web_sys::console::log_1(&out.as_str().into());
+    Value::Void
+}
+
+#[cfg(not(feature = "js"))]
 fn input(_: &mut VM, args: &[Value]) -> Value {
     let mut stdout = std::io::stdout().lock();
 
@@ -108,6 +138,7 @@ fn input(_: &mut VM, args: &[Value]) -> Value {
     }
 }
 
+#[cfg(not(feature = "js"))]
 fn random(vm: &mut VM, args: &[Value]) -> Value {
     let rng = vm.rng.get_or_insert_with(rand::thread_rng);
 
@@ -116,6 +147,24 @@ fn random(vm: &mut VM, args: &[Value]) -> Value {
             Value::Number(rng.gen_range(n1.round() as i32..=n2.round() as i32) as f32)
         }
         _ => panic!(),
+    }
+}
+
+#[cfg(feature = "js")]
+fn random(_: &mut VM, args: &[Value]) -> Value {
+    let float = js_sys::Math::random() as f32;
+
+    match (args.get(0), args.get(1)) {
+        (Some(Value::Number(n1)), Some(Value::Number(n2))) => {
+            Value::Number((float * (n2 - n1 + 1.)).floor() + n1)
+        }
+        (n1, _) => {
+            let Some(Value::Number(_)) = n1 else {
+                fail!("expected a number for the first argument", BUILTIN);
+            };
+
+            fail!("expected a number for the second argument", BUILTIN);
+        }
     }
 }
 

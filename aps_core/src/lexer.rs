@@ -31,6 +31,7 @@ pub enum Token {
     GreaterEqual,
     Less,
     LessEqual,
+    Unknown,
     Keyword(Keyword),
 }
 
@@ -63,6 +64,7 @@ impl AsRef<str> for Token {
             Self::GreaterEqual => "`>=`",
             Self::Less => "`<`",
             Self::LessEqual => "`<=`",
+            Self::Unknown => "unknown character",
             Self::Keyword(Keyword::Mod) => "`MOD`",
             Self::Keyword(Keyword::Not) => "`NOT`",
             Self::Keyword(Keyword::And) => "`AND`",
@@ -391,7 +393,10 @@ impl<'a> Lexer<'a> {
                 }
                 Some(b'1'..=b'9') => self.token = self.integer_continue(),
                 None => self.token = Token::EOF,
-                _ => {}
+                _ => {
+                    self.token = Token::Unknown;
+                    self.index += 1;
+                }
             }
 
             break 'main;

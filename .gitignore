@@ -1,3 +1,4 @@
 /target
 .vscode
 /*.aps
+editor/node_modules
