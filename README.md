@@ -41,6 +41,12 @@ a hashtag.
 # Comments do not do anything at runtime.
 ```
 
+> **Tip**: Although comments may seem useless, they are extremely important in
+> real-world codebases because it can be nearly impossible to understand what a
+> 100+ line function is doing without any explanation. Even just adding a
+> comment above a function will go a long ways towards maintaining a healthy
+> codebase.
+
 ### Variables
 
 Variables allow you to store data into named locations and can be created using
