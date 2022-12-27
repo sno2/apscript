@@ -11,7 +11,7 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 
 ### Playground
 
-The interpreter is patched along with a custom interpreter using Monaco, the
+The interpreter is patched along with a web playground using Monaco, the
 text editor that powers VS Code, and term.js, an emulated terminal for the web.
 The interpreter supports live parse checking and runtime error diagnostics
 integrated into both the terminal and editor.
