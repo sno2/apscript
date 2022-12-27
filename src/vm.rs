@@ -152,17 +152,24 @@ impl<'a> VM<'a> {
                 let v = tee!(self.eval_expr(value));
 
                 let Value::Array(array) = &v else {
-					fail!("expected index on array type", *span);
+					fail!(format!("{v:?} is not an array"), *span);
 				};
 
-                let Value::Number(idx) = tee!(self.eval_expr(index)) else {
-					fail!("expected an integer index", *span);
+                let idx = tee!(self.eval_expr(index));
+                let Value::Number(idx) = idx else {
+					fail!(format!("{idx:?} is not an integer"), *span);
 				};
 
                 let array = array.borrow();
                 match array.items.get(idx as u32 as usize - 1) {
                     Some(v) => v.clone(),
-                    None => fail!("array index is out of range", *span),
+                    None => fail!(
+                        format!(
+                            "index {idx} is out of array range (length: {})",
+                            array.items.len()
+                        ),
+                        *span
+                    ),
                 }
             }
             Expr::True { .. } => Value::Bool(true),
@@ -190,44 +197,48 @@ impl<'a> VM<'a> {
 
                 if let UnaryOpKind::Not = kind {
                     let Value::Bool(b) = val else {
-						fail!("expected a boolean type for operation", value.span());
+						fail!(format!("{val:?} is not a boolean"), value.span());
 					};
 
                     break 'blk Value::Bool(!b);
                 }
 
                 let Value::Number(n) = val else {
-					fail!("expected a number type for operation", value.span());
+					fail!(format!("{val:?} is not a boolean"), value.span());
 				};
                 Value::Number(if let UnaryOpKind::Pos = kind { n } else { -n })
             }
             Expr::BinaryOp { kind, lhs, rhs } => match kind {
                 BinaryOpKind::And => 'blk: {
-                    let Value::Bool(b1) = tee!(self.eval_expr(lhs)) else {
-						fail!("expected a boolean for logical comparator", lhs.span());
+                    let lhs_value = tee!(self.eval_expr(lhs));
+                    let Value::Bool(b1) = lhs_value else {
+						fail!(format!("{lhs_value:?} is not a boolean"), lhs.span());
 					};
 
                     if !b1 {
                         break 'blk Value::Bool(false);
                     }
 
-                    let Value::Bool(b2) = tee!(self.eval_expr(rhs)) else {
-						fail!("expected a boolean for logical comparator", rhs.span());
+                    let rhs_value = tee!(self.eval_expr(rhs));
+                    let Value::Bool(b2) = rhs_value else {
+						fail!(format!("{rhs_value:?} is not a boolean"), rhs.span());
 					};
 
                     Value::Bool(b2)
                 }
                 BinaryOpKind::Or => 'blk: {
-                    let Value::Bool(b1) = tee!(self.eval_expr(lhs)) else {
-						fail!("expected a boolean for logical comparator", lhs.span());
+                    let lhs_value = tee!(self.eval_expr(lhs));
+                    let Value::Bool(b1) = lhs_value else {
+						fail!(format!("{lhs_value:?} is not a boolean"), lhs.span());
 					};
 
                     if b1 {
                         break 'blk Value::Bool(true);
                     }
 
-                    let Value::Bool(b2) = tee!(self.eval_expr(rhs)) else {
-						fail!("expected a boolean for logical comparator", rhs.span());
+                    let rhs_value = tee!(self.eval_expr(rhs));
+                    let Value::Bool(b2) = rhs_value else {
+						fail!(format!("{rhs_value:?} is not a boolean"), rhs.span());
 					};
 
                     Value::Bool(b2)
@@ -257,11 +268,11 @@ impl<'a> VM<'a> {
                     let rhs_value = tee!(self.eval_expr(rhs));
 
                     let Value::Number(n1) = lhs_value else {
-						fail!("expected a number type for operation", lhs.span());
+						fail!(format!("{lhs_value:?} is not a number"), lhs.span());
 					};
 
                     let Value::Number(n2) = rhs_value else {
-						fail!("expected a number type for operation", rhs.span());
+						fail!(format!("{rhs_value:?} is not a number"), rhs.span());
 					};
 
                     match kind {
@@ -442,7 +453,7 @@ impl<'a> VM<'a> {
                 } => {
                     let arr = tee!(self.eval_expr(array));
                     let Value::Array(arr) = &arr else {
-						fail!(format!("'{:?}' is not an array", array), array.span());
+						fail!(format!("{:?} is not an array", array), array.span());
 					};
 
                     let mut i = 0;
