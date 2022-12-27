@@ -13,8 +13,8 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 
 The interpreter is patched along with a custom interpreter using Monaco, the
 text editor that powers VS Code, and term.js, an emulated terminal for the web.
-The interpreter supports live parse checking and runtime error diagnostics in
-the terminal and integrated into the editor.
+The interpreter supports live parse checking and runtime error diagnostics
+integrated into both the terminal and editor.
 
 ## Language Guide
 
