@@ -21,11 +21,25 @@ be confused if you are.
 
 #### Table of Contents
 
-1. [Variables](#variables)
-2. [Lists](#lists)
-3. [Conditionals](#conditionals)
-4. [Loops](#loops)
-5. [I/O](#io)
+1. [Comments](#comments)
+2. [Variables](#variables)
+3. [Lists](#lists)
+4. [Conditionals](#conditionals)
+5. [Loops](#loops)
+6. [I/O](#io)
+
+### Comments
+
+Comments allow other programmers and yourself to understand code better by
+including annotations along with the logic. AP's specification did not include
+a syntax for comments so I implemented Python-style comments which start with
+a hashtag.
+
+```
+# This is a comment.
+# This is another comment.
+# Comments do not do anything at runtime.
+```
 
 ### Variables
 
@@ -61,6 +75,22 @@ age <- age + 5
 | ------------- | ----- |
 | age (initial) | `20`  |
 | age (final)   | `25`  |
+
+Text can be assigned to variables as well in the form of strings. Although, the
+only useful operations you can do with text mostly relate to input/output which
+will be [explained later in the guide](#io).
+
+Anyways, strings start with a double quote and continue until another double
+quote. Do not include new lines in your strings. All of the text in-between is
+considered part of the string.
+
+```
+message <- "Hello, world!"
+```
+
+| Variable | Value             |
+| -------- | ----------------- |
+| message  | `"Hello, world!"` |
 
 ### Lists
 
