@@ -29,7 +29,7 @@ header {
 
 header .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 1rem;
 }
 
@@ -50,15 +50,13 @@ header h1 {
   font-size: 1.2rem;
 }
 
-header h2 {
-  padding: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  text-align: center;
+header .github {
+  display: flex;
+  justify-content: right;
 }
 
-header h2 a {
-  color: inherit;
+header .github img {
+  height: 1.8rem;
 }
 
 #editor {

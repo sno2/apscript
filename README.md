@@ -6,8 +6,22 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 
 - Robust garbage collector (using `gc`)
 - Pitch-perfect specification conformity
-- Beautiful error logging for parsing and runtime errors (using `codespan-reporting`)
+- Beautiful error logging for parsing and runtime errors (using
+  `codespan-reporting`)
 - Hackable virtual machine design
+
+## Usage
+
+You can either install the local CLI to run APScript, or check out the online
+playground.
+
+### CLI
+
+Install the CLI by running the following Cargo command:
+
+```bash
+$ cargo install aps
+```
 
 ### Playground
 
