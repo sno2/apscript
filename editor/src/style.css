@@ -24,17 +24,21 @@ header {
   display: grid;
   align-items: center;
   grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #eee;
+}
+
+header .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 header button {
-  margin-left: auto;
-  width: 4rem;
-  display: inline-block;
   background: transparent;
   border-radius: 0.2rem;
   font-family: inherit;
-  font-size: 1rem;
-  padding: 0.25rem 0.7rem;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.9rem;
   cursor: pointer;
   outline: none;
   border: 1px solid black;

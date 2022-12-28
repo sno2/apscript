@@ -7,6 +7,11 @@ import { Terminal } from "xterm";
 
 import loader from "@monaco-editor/loader";
 
+const $buttons = {
+  examples: document.querySelector<HTMLElement>(".actions .examples")!,
+  run: document.querySelector<HTMLElement>(".actions .run")!,
+};
+
 const $term = document.querySelector<HTMLElement>(".terminal")!;
 var term = new Terminal({
   fontFamily: "Roboto Mono",
@@ -59,7 +64,7 @@ const editor = monaco.editor.create(document.querySelector("#editor")!, {
   language: "coffeescript",
 });
 
-document.querySelector("button")?.addEventListener("click", run);
+$buttons.run.addEventListener("click", run);
 
 editor.addAction({
   id: "aps.run",
@@ -71,7 +76,7 @@ editor.addAction({
 });
 
 function run() {
-  term.write("\r$ aps run <myfile.ts>\r\n");
+  term.write("\r$ aps run <file>\r\n");
   const result = interpret(editor.getValue());
 
   markers.length = 0;
@@ -100,6 +105,10 @@ function run() {
   }
   term.write("$ ");
 }
+
+$buttons.examples.addEventListener("click", () => {
+  alert("Examples");
+});
 
 const markers: monaco.editor.IMarkerData[] = [];
 
