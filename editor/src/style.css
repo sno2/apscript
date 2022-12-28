@@ -44,6 +44,14 @@ header button {
   border: 1px solid black;
 }
 
+header .examples {
+  border: none;
+}
+
+header .examples:hover {
+  background: #ebebeb;
+}
+
 header h1 {
   padding: 0;
   margin: 0;
@@ -57,6 +65,51 @@ header .github {
 
 header .github img {
   height: 1.8rem;
+}
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  transition: background 200ms ease;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#overlay.showing {
+  display: flex;
+  animation: show;
+}
+
+#overlay .content {
+  width: 40vw;
+  height: 60vh;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.4rem;
+  padding: 2rem;
+  min-width: 35rem;
+}
+
+#overlay h1 {
+  margin: 0;
+  padding: 0;
+}
+
+#overlay ul {
+  margin: 0;
+  margin-top: 1rem;
+  padding-left: 1.25rem;
+}
+
+#overlay li {
+  padding: 0.5rem 0;
+  font-size: 1rem;
 }
 
 #editor {

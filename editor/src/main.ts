@@ -106,8 +106,16 @@ function run() {
   term.write("$ ");
 }
 
+const $overlay = document.querySelector<HTMLElement>("#overlay")!;
+
 $buttons.examples.addEventListener("click", () => {
-  alert("Examples");
+  $overlay.classList.add("showing");
+});
+
+$overlay.addEventListener("click", (e) => {
+  if (e.target === $overlay) {
+    $overlay.classList.remove("showing");
+  }
 });
 
 const markers: monaco.editor.IMarkerData[] = [];
