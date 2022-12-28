@@ -28,7 +28,9 @@ $ cargo install aps
 The interpreter is patched along with a web playground using Monaco, the
 text editor that powers VS Code, and term.js, an emulated terminal for the web.
 The interpreter supports live parse checking and runtime error diagnostics
-integrated into both the terminal and editor.
+integrated into both the terminal and editor. Furthermore, the playground
+supports browsing example programs and sharing your programs with anyone in the
+world!
 
 ## Language Guide
 
