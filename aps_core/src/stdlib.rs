@@ -16,22 +16,13 @@ use crate::{
 pub fn inject(vm: &mut VM) {
     let builtins = [
         ("DISPLAY", display as BuiltinPtr),
-        ("display", display),
         #[cfg(not(feature = "js"))]
         ("INPUT", input),
-        #[cfg(not(feature = "js"))]
-        ("input", input),
         ("RANDOM", random),
-        ("random", random),
         ("APPEND", append),
-        ("append", append),
         ("INSERT", insert),
-        ("insert", insert),
-        ("append", append),
         ("REMOVE", remove),
-        ("remove", remove),
         ("LENGTH", length),
-        ("length", length),
     ];
 
     vm.scope.extend(
