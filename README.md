@@ -23,6 +23,12 @@ Install the CLI by running the following Cargo command:
 $ cargo install aps
 ```
 
+Run a program via the following command:
+
+```bash
+$ aps run <file>
+```
+
 ### Playground
 
 The interpreter is patched along with a web playground using Monaco, the
