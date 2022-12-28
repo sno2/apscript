@@ -38,17 +38,18 @@ header button {
   border-radius: 0.2rem;
   font-family: inherit;
   font-size: 0.9rem;
-  padding: 0.4rem 0.9rem;
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
   outline: none;
-  border: 1px solid black;
-}
-
-header .examples {
   border: none;
 }
 
-header .examples:hover {
+header .run {
+  border: 1px solid black;
+}
+
+header .examples:hover,
+header .share:hover {
   background: #ebebeb;
 }
 
@@ -126,4 +127,41 @@ header .github img {
 
 .terminal .xterm {
   padding: 1rem 1rem;
+}
+
+header img.white {
+  display: none;
+}
+
+header img.black {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  header {
+    background: #1a1a1a;
+    color: #fff;
+    border-bottom: 1px solid #444;
+  }
+
+  header .actions button {
+    color: #fff;
+  }
+
+  header .run {
+    border-color: #aaa;
+  }
+
+  header .examples:hover,
+  header .share:hover {
+    background: #333;
+  }
+
+  header img.black {
+    display: none;
+  }
+
+  header img.white {
+    display: block;
+  }
 }

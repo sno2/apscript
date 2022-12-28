@@ -7,9 +7,12 @@ import { Terminal } from "xterm";
 
 import loader from "@monaco-editor/loader";
 
+const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
 const $buttons = {
   examples: document.querySelector<HTMLElement>(".actions .examples")!,
   run: document.querySelector<HTMLElement>(".actions .run")!,
+  share: document.querySelector<HTMLElement>(".actions .share")!,
 };
 
 const $term = document.querySelector<HTMLElement>(".terminal")!;
@@ -26,7 +29,7 @@ setTimeout(() => {
 
 term.open($term);
 term.write(
-  "Welcome! Use Shift + Enter to quickly run your code.\r\n\r\n$ ",
+  "Welcome! Use Shift + Enter to run your code. The terminal is inactive until you call INPUT().\r\n\r\n$ ",
 );
 
 term.onKey((e) => {
@@ -61,10 +64,41 @@ const editor = monaco.editor.create(document.querySelector("#editor")!, {
   minimap: {
     enabled: false,
   },
+  theme: darkMode ? "vs-dark" : "vs-light",
   language: "coffeescript",
 });
 
+function maybeLoadCodeURL(url: URL) {
+  if (!url.hash) return;
+
+  if (url.hash.startsWith("#code/")) {
+    try {
+      editor.setValue(atob(url.hash.slice("#code/".length)));
+    } catch {}
+  } else if (url.hash.startsWith("#examples/")) {
+    editor.setValue(`# This creates a list of names.
+names <- ["John", "Jim", "Jerry"]
+
+# You can access the first name, John, my using the bracket notation:
+firstName <- names[1]
+DISPLAY(firstName)
+
+# You can also add new names by calling the APPEND function:
+APPEND(names, "Justin")
+
+# And let's view our final list of names:
+DISPLAY(names)`);
+  }
+}
+
+maybeLoadCodeURL(location as any);
+
 $buttons.run.addEventListener("click", run);
+$buttons.share.addEventListener("click", () => {
+  window.location.hash = "code/" + btoa(editor.getValue());
+  navigator.clipboard.writeText(window.location.href).catch(console.error);
+  // TODO: show breadcrumb
+});
 
 editor.addAction({
   id: "aps.run",
@@ -143,4 +177,11 @@ editor.onDidChangeModelContent(() => {
   }
 
   monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
+});
+
+document.querySelectorAll("#overlay .content a").forEach((a) => {
+  a.addEventListener("click", () => {
+    maybeLoadCodeURL(new URL(a.href));
+    $overlay.classList.remove("showing");
+  });
 });
