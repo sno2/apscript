@@ -2,7 +2,7 @@ use crate::{
     lexer::Token,
     parser::Parser,
     stdlib,
-    vm::{Value, VM},
+    vm::{Env, Value, VM},
 };
 use codespan_reporting::{
     diagnostic::{Diagnostic, Label},
@@ -13,7 +13,7 @@ use codespan_reporting::{
     },
 };
 use serde::{Deserialize, Serialize};
-use std::io::Write as WriteIO;
+use std::{cell::RefCell, collections::HashMap, io::Write as WriteIO, rc::Rc};
 use std::{fmt::Write as WriteFmt, slice::Iter};
 use wasm_bindgen::{prelude::*, JsObject};
 
@@ -117,8 +117,9 @@ pub fn interpret(input: &str) -> Result<JsValue, JsValue> {
 
     let mut vm = VM::new(input);
 
-    stdlib::inject(&mut vm);
-    let value = vm.eval_scope(&scope.unwrap());
+    let mut env = Env::new();
+    stdlib::inject(&mut env);
+    let value = vm.eval_scope(&scope.unwrap(), Rc::new(RefCell::new(env)));
 
     if let Value::Exception(e) = &value {
         let config = codespan_reporting::term::Config::default();

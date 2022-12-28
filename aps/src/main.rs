@@ -1,3 +1,5 @@
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
+
 use codespan_reporting::{
     diagnostic::{Diagnostic, Label},
     files::SimpleFiles,
@@ -10,7 +12,7 @@ use codespan_reporting::{
 use aps_core::{
     parser::Parser,
     stdlib,
-    vm::{Value, VM},
+    vm::{Env, Value, VM},
 };
 
 use clap::{Parser as ClapParser, Subcommand};
@@ -57,9 +59,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             let mut vm = VM::new(&input);
-            stdlib::inject(&mut vm);
 
-            let value = vm.eval_scope(&value.unwrap());
+            let mut env = Env::new();
+            stdlib::inject(&mut env);
+            let value = vm.eval_scope(&value.unwrap(), Rc::new(RefCell::new(env)));
+
             if let Value::Exception(e) = &value {
                 let writer = StandardStream::stderr(ColorChoice::Always);
                 let config = codespan_reporting::term::Config::default();

@@ -10,10 +10,10 @@ use rand::Rng;
 
 use crate::{
     fail, tee,
-    vm::{Builtin, BuiltinPtr, Value, VM},
+    vm::{Builtin, BuiltinPtr, Env, Value, VM},
 };
 
-pub fn inject(vm: &mut VM) {
+pub fn inject(env: &mut Env) {
     let builtins = [
         ("DISPLAY", display as BuiltinPtr),
         #[cfg(not(feature = "js"))]
@@ -25,10 +25,10 @@ pub fn inject(vm: &mut VM) {
         ("LENGTH", length),
     ];
 
-    vm.scope.extend(
+    env.entries.extend(
         builtins
             .into_iter()
-            .map(|(name, ptr)| (name, Value::Builtin(Builtin(ptr)))),
+            .map(|(name, ptr)| (name.into(), Value::Builtin(Builtin(ptr)))),
     );
 }
 

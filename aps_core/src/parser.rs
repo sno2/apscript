@@ -374,7 +374,24 @@ impl<'a, T: Copy> Parser<'a, T> {
                     self.lex.next();
                     let name = self.eat(Token::Identifier)?;
                     self.eat(Token::LeftParen)?;
+                    let mut params = Vec::new();
+
+                    loop {
+                        if self.lex.token == Token::RightParen {
+                            break;
+                        }
+
+                        let param = self.eat(Token::Identifier)?;
+                        params.push(param);
+
+                        match self.lex.token {
+                            Token::Comma => self.lex.next(),
+                            _ => break,
+                        }
+                    }
+
                     self.eat(Token::RightParen)?;
+
                     self.eat(Token::LeftBrace)?;
                     let scope = self.parse_scope(false)?;
                     let end = self.lex.index as u32;
@@ -393,7 +410,7 @@ impl<'a, T: Copy> Parser<'a, T> {
 
                     nodes.push(Stmt::Procedure(Procedure {
                         name,
-                        params: Box::new([]),
+                        params: params.into_boxed_slice(),
                         scope,
                     }));
                 }
