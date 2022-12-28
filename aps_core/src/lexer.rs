@@ -230,10 +230,14 @@ impl<'a> Lexer<'a> {
                 }
                 Some(b'#') => loop {
                     self.index += 1;
-                    if let Some(b'\n') = self.buffer.get(self.index) {
-                        self.index += 1;
-                        self.has_newline_before = true;
-                        continue 'main;
+                    match self.buffer.get(self.index) {
+                        Some(b'\n') => {
+                            self.index += 1;
+                            self.has_newline_before = true;
+                            continue 'main;
+                        }
+                        None => continue 'main,
+                        _ => {}
                     }
                 },
                 Some(b'(') => {
