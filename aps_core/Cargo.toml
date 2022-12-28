@@ -7,8 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["js"]
-# default = ["rand"]
+default = ["rand"]
 js = ["wasm-bindgen", "web-sys", "js-sys", "serde", "serde-wasm-bindgen", "codespan-reporting/serialization"]
 
 [dependencies]

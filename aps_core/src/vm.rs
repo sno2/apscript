@@ -360,6 +360,24 @@ impl<'a> VM<'a> {
                         Value::Procedure(Rc::new(proc.clone())),
                     );
                 }
+                Stmt::IndexAssign { root, index, value } => {
+                    let rootv = tee!(self.eval_expr(root));
+                    let Value::Array(rootv) = &rootv else {
+						fail!(format!("{rootv:?} is not an array"), root.span());
+					};
+
+                    let indexv = tee!(self.eval_expr(index));
+                    let Value::Number(idx) = &indexv else {
+						fail!(format!("{indexv:?} is not a number"), index.span());
+					};
+
+                    let mut rootv = rootv.borrow_mut();
+                    let Some(vptr) = rootv.items.get_mut(*idx as u32 as usize - 1) else {
+						fail!(format!("index is out of bounds: the length is {:?} but the index is {idx}", rootv.items.len()), stmt.span());
+					};
+
+                    *vptr = tee!(self.eval_expr(value));
+                }
                 Stmt::Return { value, .. } => return self.eval_expr(value),
                 Stmt::If {
                     cond,

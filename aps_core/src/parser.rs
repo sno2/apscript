@@ -277,10 +277,24 @@ impl<'a, T: Copy> Parser<'a, T> {
                             self.expect_stmt_end(&stmt);
                             nodes.push(stmt);
                         }
-                        _ => {
+                        _ => 'blk: {
                             self.lex.index = name.start as usize;
                             self.lex.next();
                             let value = self.parse_expr(0)?;
+
+                            if self.lex.token == Token::ThinArrow {
+                                self.lex.next();
+                                let Expr::Index { value: root, index, .. } = value else {
+									self.expect_stmt_end(&value);
+									return Err(());
+								};
+
+                                let value = self.parse_expr(0)?;
+                                let node = Stmt::IndexAssign { root, index, value };
+                                self.expect_stmt_end(&node);
+                                nodes.push(node);
+                                break 'blk;
+                            }
                             self.expect_stmt_end(&value);
                             nodes.push(Stmt::Expr(value));
                         }
@@ -290,8 +304,25 @@ impl<'a, T: Copy> Parser<'a, T> {
                 | Token::Sub
                 | Token::IntegerLiteral
                 | Token::LeftBrack
-                | Token::LeftParen => {
+                | Token::LeftParen => 'blk: {
                     let value = self.parse_expr(0)?;
+
+                    if self.lex.token == Token::ThinArrow {
+                        println!("HERE!");
+                        self.lex.next();
+                        let Expr::Index { value: root, index, .. } = value else {
+							self.expect_stmt_end(&value);
+							nodes.push(Stmt::Expr(value));
+							break 'blk;
+						};
+
+                        let value = self.parse_expr(0)?;
+                        let node = Stmt::IndexAssign { root, index, value };
+                        self.expect_stmt_end(&node);
+                        nodes.push(node);
+                        break 'blk;
+                    }
+
                     self.expect_stmt_end(&value);
                     nodes.push(Stmt::Expr(value));
                 }

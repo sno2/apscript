@@ -20,7 +20,9 @@ setTimeout(() => {
 }, 200);
 
 term.open($term);
-term.write("$ ");
+term.write(
+  "Welcome! Use Shift + Enter to quickly run your code.\r\n\r\n$ ",
+);
 
 term.onKey((e) => {
   if (e.key.charCodeAt(0) == 13) {
@@ -54,10 +56,21 @@ const editor = monaco.editor.create(document.querySelector("#editor")!, {
   minimap: {
     enabled: false,
   },
-  language: "sql",
+  language: "coffeescript",
 });
 
-document.querySelector("button")?.addEventListener("click", () => {
+document.querySelector("button")?.addEventListener("click", run);
+
+editor.addAction({
+  id: "aps.run",
+  label: "Run APScript",
+  keybindings: [
+    monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+  ],
+  run,
+});
+
+function run() {
   term.write("\r$ aps run <myfile.ts>\r\n");
   const result = interpret(editor.getValue());
 
@@ -86,7 +99,7 @@ document.querySelector("button")?.addEventListener("click", () => {
     monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
   }
   term.write("$ ");
-});
+}
 
 const markers: monaco.editor.IMarkerData[] = [];
 
@@ -106,7 +119,9 @@ editor.onDidChangeModelContent(() => {
       startColumn: start.column,
       endColumn: end.column,
       message: errors[i].message,
-      severity: monaco.MarkerSeverity.Error,
+      severity: i === 0
+        ? monaco.MarkerSeverity.Error
+        : monaco.MarkerSeverity.Info,
     };
   }
 

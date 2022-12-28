@@ -146,7 +146,7 @@ fn random(vm: &mut VM, args: &[Value]) -> Value {
         (Some(Value::Number(n1)), Some(Value::Number(n2))) => {
             Value::Number(rng.gen_range(n1.round() as i32..=n2.round() as i32) as f32)
         }
-        _ => panic!(),
+        _ => fail!("expected valid range start and end numbers", BUILTIN),
     }
 }
 

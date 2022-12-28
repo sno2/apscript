@@ -160,6 +160,11 @@ pub enum Stmt {
         name: Span,
         value: Expr,
     },
+    IndexAssign {
+        root: Box<Expr>,
+        index: Box<Expr>,
+        value: Expr,
+    },
     If {
         cond: Box<Expr>,
         scope: Box<[Stmt]>,
@@ -209,6 +214,14 @@ impl Node for Stmt {
             },
             Self::VarAssign { name, value } => Span {
                 start: name.start,
+                end: value.span().end,
+            },
+            Self::IndexAssign {
+                root,
+                index: _,
+                value,
+            } => Span {
+                start: root.span().start,
                 end: value.span().end,
             },
             _ => panic!(),

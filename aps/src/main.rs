@@ -13,58 +13,82 @@ use aps_core::{
     vm::{Value, VM},
 };
 
-fn main() {
-    let input = std::fs::read_to_string("foo.aps").unwrap();
+use clap::{Parser as ClapParser, Subcommand};
 
-    let mut files = SimpleFiles::new();
-    let fid = files.add("foo.aps", &input);
+#[derive(Debug, ClapParser)]
+#[command(name = "aps")]
+#[command(about = "An interpreter for the AP Pseudocode language", long_about = None)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
 
-    let mut parser = Parser::new(fid, input.as_bytes());
-    parser.lex.next();
+#[derive(Debug, Subcommand)]
+enum Commands {
+    /// Runs a given file.
+    #[command(arg_required_else_help = true)]
+    Run { file: String },
+}
 
-    let value = parser.parse_scope(true);
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Cli::parse();
 
-    if parser.diagnostics.len() != 0 {
-        let writer = StandardStream::stderr(ColorChoice::Always);
-        let config = codespan_reporting::term::Config::default();
-        let mut writer = writer.lock();
+    match args.command {
+        Commands::Run { file } => {
+            let input = std::fs::read_to_string(&file)?;
 
-        for diagnostic in parser.diagnostics.iter() {
-            term::emit(&mut writer, &config, &files, diagnostic).unwrap();
+            let mut files = SimpleFiles::new();
+            let fid = files.add(&file, &input);
+
+            let mut parser = Parser::new(fid, input.as_bytes());
+            parser.lex.next();
+
+            let value = parser.parse_scope(true);
+
+            if parser.diagnostics.len() != 0 {
+                let writer = StandardStream::stderr(ColorChoice::Always);
+                let config = codespan_reporting::term::Config::default();
+                let mut writer = writer.lock();
+
+                for diagnostic in parser.diagnostics.iter() {
+                    term::emit(&mut writer, &config, &files, diagnostic)?;
+                }
+                std::process::exit(1);
+            }
+
+            let mut vm = VM::new(&input);
+            stdlib::inject(&mut vm);
+
+            let value = vm.eval_scope(&value.unwrap());
+            if let Value::Exception(e) = &value {
+                let writer = StandardStream::stderr(ColorChoice::Always);
+                let config = codespan_reporting::term::Config::default();
+                let mut writer = writer.lock();
+
+                term::emit(
+                    &mut writer,
+                    &config,
+                    &files,
+                    &Diagnostic::error()
+                        .with_message(&e.message)
+                        .with_labels(vec![Label::primary(fid, e.span)]),
+                )?;
+
+                for itm in e.stack.iter() {
+                    term::emit(
+                        &mut writer,
+                        &config,
+                        &files,
+                        &Diagnostic::note()
+                            .with_message("called here")
+                            .with_labels(vec![Label::primary(fid, *itm)]),
+                    )?;
+                }
+
+                std::process::exit(1);
+            }
         }
-
-        return;
     }
 
-    let mut vm = VM::new(&input);
-    stdlib::inject(&mut vm);
-
-    let value = vm.eval_scope(&value.unwrap());
-    if let Value::Exception(e) = &value {
-        let writer = StandardStream::stderr(ColorChoice::Always);
-        let config = codespan_reporting::term::Config::default();
-        let mut writer = writer.lock();
-
-        term::emit(
-            &mut writer,
-            &config,
-            &files,
-            &Diagnostic::error()
-                .with_message(&e.message)
-                .with_labels(vec![Label::primary(fid, e.span)]),
-        )
-        .unwrap();
-
-        for itm in e.stack.iter() {
-            term::emit(
-                &mut writer,
-                &config,
-                &files,
-                &Diagnostic::note()
-                    .with_message("called here")
-                    .with_labels(vec![Label::primary(fid, *itm)]),
-            )
-            .unwrap();
-        }
-    }
+    Ok(())
 }

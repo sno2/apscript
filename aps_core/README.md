@@ -6,15 +6,11 @@ The core lexer/parser/virtual machine/WASM bindings for aps.
 
 ### JS (WASM)
 
-```sh
-$ cargo build --package aps_core --no-default-features --features=js --target=wasm32-unknown-unknown --release
-$ wasm-bindgen target/wasm32-unknown-unknown/release/aps_core.wasm --web --out-dir=editor/lib
-```
-
-Watching mode:
+Run the following command in the root of the repository to build the package in
+the `editor` directory.
 
 ```sh
-$ cargo watch -s "cargo build --package aps_core --no-default-features --features=js --target=wasm32-unknown-unknown --release && wasm-bindgen target/wasm32-unknown-unknown/release/aps_core.wasm --web --out-dir=editor/lib"
+$ wasm-pack build aps_core --target web --out-dir=../editor/lib --features=js --no-default-features
 ```
 
 ### Regular

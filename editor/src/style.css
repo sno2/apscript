@@ -36,12 +36,14 @@ header button {
   font-size: 1rem;
   padding: 0.25rem 0.7rem;
   cursor: pointer;
+  outline: none;
+  border: 1px solid black;
 }
 
 header h1 {
   padding: 0;
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 }
 
 header h2 {
