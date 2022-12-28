@@ -30,7 +30,7 @@ header {
 header .actions {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 header button {
@@ -46,6 +46,7 @@ header button {
 
 header .run {
   border: 1px solid black;
+  margin-right: 1rem;
 }
 
 header .examples:hover,
@@ -137,7 +138,7 @@ header img.black {
   display: block;
 }
 
-@media (prefers-color-scheme: dark) {
+body.dark {
   header {
     background: #1a1a1a;
     color: #fff;
@@ -163,5 +164,9 @@ header img.black {
 
   header img.white {
     display: block;
+  }
+
+  #editor {
+    background: #222;
   }
 }

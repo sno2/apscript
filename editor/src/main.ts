@@ -1,4 +1,4 @@
-import "./style.css";
+import "./style.scss";
 import "xterm/css/xterm.css";
 import { FitAddon } from "xterm-addon-fit";
 import init, { interpret, validate } from "../lib/aps_core";
@@ -8,6 +8,10 @@ import { Terminal } from "xterm";
 import loader from "@monaco-editor/loader";
 
 const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+if (darkMode) {
+  document.body.classList.add("dark");
+}
 
 const $buttons = {
   examples: document.querySelector<HTMLElement>(".actions .examples")!,
@@ -29,15 +33,15 @@ setTimeout(() => {
 
 term.open($term);
 term.write(
-  "Welcome! Use Shift + Enter to run your code. The terminal is inactive until you call INPUT().\r\n\r\n$ ",
+  "Welcome! Use Shift + Enter or press the Run button to run your code. The terminal is inactive until you call INPUT().\r\n\r\n$ ",
 );
 
-term.onKey((e) => {
-  if (e.key.charCodeAt(0) == 13) {
-    term.write("\n");
-  }
-  term.write(e.key);
-});
+// term.onKey((e) => {
+//   if (e.key.charCodeAt(0) == 13) {
+//     term.write("\n");
+//   }
+//   term.write(e.key);
+// });
 
 init("../lib/aps_core_bg.wasm").catch((e) => {
   alert("Failed to load WASM file. Try reloading the page.");
