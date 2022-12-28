@@ -295,6 +295,7 @@ impl<'a> Lexer<'a> {
                 Some(b'!') => {
                     self.index += 1;
                     self.token = if let Some(b'=') = self.buffer.get(self.index) {
+                        self.index += 1;
                         Token::NotEqual
                     } else {
                         Token::Equal
