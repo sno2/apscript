@@ -192,5 +192,10 @@ body.dark {
     background: #222;
     border-color: #333;
     color: #fbfbfb;
+
+    a {
+      color: inherit;
+      opacity: 0.9;
+    }
   }
 }

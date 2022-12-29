@@ -145,6 +145,13 @@ DISPLAY(add(2, 5))
 DISPLAY(add(6, 2))
 DISPLAY(add(-2, 5))`,
       );
+    } else if (id === "iterating-lists") {
+      editor.setValue(`# Create a list of colors.
+colors <- ["red", "green", "blue"]
+
+FOR EACH color IN colors {
+	DISPLAY(color)
+}`);
     }
   }
 }
