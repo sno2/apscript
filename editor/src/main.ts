@@ -56,7 +56,7 @@ term.write(welcomeMessage);
 //   term.write(e.key);
 // });
 
-init("../aps_core_bg.wasm").catch((e) => {
+init("/aps_core_bg.wasm").catch((e) => {
   alert("Failed to load WASM file. Try reloading the page.");
   console.error(e);
 });
