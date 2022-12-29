@@ -12,25 +12,6 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 
 ## Usage
 
-You can either install the local CLI to run APScript, or check out the online
-playground.
-
-### CLI
-
-Install the CLI by running the following Cargo command:
-
-```bash
-$ cargo install aps
-```
-
-Run a program via the following command:
-
-```bash
-$ aps run <file>
-```
-
-### Playground
-
 The interpreter is patched along with a web playground using Monaco, the
 text editor that powers VS Code, and term.js, an emulated terminal for the web.
 The interpreter supports live parse checking and runtime error diagnostics

@@ -194,6 +194,8 @@ colors <- ["red", "green", "blue"]
 FOR EACH color IN colors {
 	DISPLAY(color)
 }`);
+    } else if (id === "hello-world") {
+      editor.setValue('DISPLAY("Hello, world!")');
     }
   }
 }
