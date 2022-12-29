@@ -76,6 +76,7 @@ loader.init().then((mon) => {
     },
     theme: darkMode ? "vs-dark" : "vs-light",
     language: "coffeescript",
+    value: 'DISPLAY("Hello, world!")',
   });
 
   maybeLoadCodeURL(location as any);
