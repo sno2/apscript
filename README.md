@@ -5,7 +5,7 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 ## Features
 
 - Robust garbage collector (using `gc`)
-- Pitch-perfect specification conformity
+- Great Specification conformity
 - Beautiful error logging for parsing and runtime errors (using
   `codespan-reporting`)
 - Hackable virtual machine design
