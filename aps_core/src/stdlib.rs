@@ -16,7 +16,6 @@ use crate::{
 pub fn inject(env: &mut Env) {
     let builtins = [
         ("DISPLAY", display as BuiltinPtr),
-        #[cfg(not(feature = "js"))]
         ("INPUT", input),
         ("RANDOM", random),
         ("APPEND", append),
@@ -121,6 +120,30 @@ fn input(_: &mut VM, args: &[Value]) -> Value {
 	};
 
     let outs = out.trim();
+
+    if let Ok(f) = outs.parse() {
+        Value::Number(f)
+    } else {
+        Value::String(Gc::new(outs.to_owned()))
+    }
+}
+
+#[cfg(feature = "js")]
+fn input(_: &mut VM, args: &[Value]) -> Value {
+    use gc::Gc;
+
+    let mut out = String::new();
+    _ = tee!(display_helper(&mut out, args));
+
+    let Some(window) = web_sys::window() else {
+		fail!("failed to prompt user", BUILTIN);
+	};
+
+    let Ok(Some(msg)) = window.prompt_with_message(&out) else {
+		fail!("failed to prompt user", BUILTIN);
+	};
+
+    let outs = msg.trim();
 
     if let Ok(f) = outs.parse() {
         Value::Number(f)

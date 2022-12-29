@@ -169,4 +169,28 @@ body.dark {
   #editor {
     background: #222;
   }
+
+  .terminal .xterm {
+    // ::-webkit-scrollbar {
+    //   background: #222;
+    // }
+
+    ::-webkit-scrollbar-button {
+      background: #ccc;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: "blue";
+    }
+  }
+
+  #overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  #overlay .content {
+    background: #222;
+    border-color: #333;
+    color: #fbfbfb;
+  }
 }

@@ -537,7 +537,7 @@ impl<'a> VM<'a> {
 					};
                 },
                 Stmt::For {
-                    alias: _,
+                    alias,
                     array,
                     scope,
                 } => {
@@ -553,6 +553,16 @@ impl<'a> VM<'a> {
                         if i >= len {
                             break;
                         }
+
+                        let arrb = arr.borrow();
+                        let Some(val) = arrb.items.get(i) else {
+							break;
+						};
+
+                        env.borrow_mut().entries.insert(
+                            self.source[alias.start as usize..alias.end as usize].into(),
+                            val.clone(),
+                        );
 
                         let scope_val = tee!(self.eval_scope(scope, env.clone()));
 

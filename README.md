@@ -213,6 +213,32 @@ IF (age >= 18) {
 `IF` statements can be combined with a trailing `ELSE` statement which will only
 run if the `IF` statement's expression was false.
 
+```
+age <- 16
+
+IF (age >= 18) {
+	# this code will not run
+} ELSE {
+	# this code will run - the first condition was false
+}
+```
+
+Furthermore, `ELSE IF` statements can be tagged after an `IF` statement to add
+extra checks that only take place if the initial `IF` statement's condition
+was false.
+
+```
+age <- 16
+
+IF (age >= 18) {
+	# this code will not run
+} ELSE IF (age >= 13) {
+	# this code will run - 1st condition false, 2nd true
+} ELSE {
+	# this code will not run
+}
+```
+
 ### Loops
 
 The pseudocode includes three different kinds of loops. The most basic loop is
@@ -242,10 +268,27 @@ REPEAT UNTIL (LENGTH(list) = 5) {
 }
 ```
 
-| State          |                        |
+| State          | Value                  |
 | -------------- | ---------------------- |
 | list (initial) | `[]`                   |
 | list (final)   | `[10, 10, 10, 10, 10]` |
+
+The most niche loop availabe is the `FOR EACH` loop. This allows you to easily
+iterate through the items of a list. For example, let's create a list of ages
+and output the predicted age in a year.
+
+```
+ages <- [15, 20, 23]
+predictedAges <- []
+
+FOR EACH age IN ages {
+	APPEND(predictedAges, age + 1)
+}
+```
+
+| Variable      | Value          |
+| ------------- | -------------- |
+| predictedAges | `[16, 21, 24]` |
 
 ### I/O
 
