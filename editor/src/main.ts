@@ -3,7 +3,7 @@
 import "./style.scss";
 import "xterm/css/xterm.css";
 import { FitAddon } from "xterm-addon-fit";
-import init, { interpret, validate } from "../lib/aps_core";
+import init, { interpret, validate } from "../public/aps_core";
 
 import { Terminal } from "xterm";
 
