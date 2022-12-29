@@ -1,3 +1,5 @@
+// I am sorry, for I have sinned.
+
 import "./style.scss";
 import "xterm/css/xterm.css";
 import { FitAddon } from "xterm-addon-fit";
@@ -5,7 +7,7 @@ import init, { interpret, validate } from "../lib/aps_core";
 
 import { Terminal } from "xterm";
 
-import loader from "@monaco-editor/loader";
+import loader, { Monaco } from "@monaco-editor/loader";
 
 const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -59,7 +61,59 @@ init("../lib/aps_core_bg.wasm").catch((e) => {
   console.error(e);
 });
 
-let monaco = await loader.init();
+let monaco!: Monaco;
+let editor!: any;
+loader.init().then((mon) => {
+  monaco = mon;
+
+  editor = monaco.editor.create(document.querySelector("#editor")!, {
+    autoIndent: "full",
+    fontFamily: "Roboto Mono",
+    readOnly: false,
+    fontSize: 16,
+    minimap: {
+      enabled: false,
+    },
+    theme: darkMode ? "vs-dark" : "vs-light",
+    language: "coffeescript",
+  });
+
+  maybeLoadCodeURL(location as any);
+
+  editor.addAction({
+    id: "aps.run",
+    label: "Run APScript",
+    keybindings: [
+      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+    ],
+    run,
+  });
+
+  editor.onDidChangeModelContent(() => {
+    const errors = validate(editor.getValue());
+
+    markers.length = errors?.length ?? 0;
+    if (!errors) return;
+
+    for (let i = 0; i < errors.length; i++) {
+      const model = editor.getModel()!;
+      const start = model.getPositionAt(errors[i].labels[0].range.start);
+      const end = model.getPositionAt(errors[i].labels[0].range.end);
+      markers[i] = {
+        startLineNumber: start.lineNumber,
+        endLineNumber: end.lineNumber,
+        startColumn: start.column,
+        endColumn: end.column,
+        message: errors[i].message,
+        severity: i === 0
+          ? monaco.MarkerSeverity.Error
+          : monaco.MarkerSeverity.Info,
+      };
+    }
+
+    monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
+  });
+});
 
 const old = console.log;
 console.log = (...args) => {
@@ -74,23 +128,11 @@ console.log = (...args) => {
 const oldPrompt = window.prompt;
 
 window.prompt = (msg) => {
-  term.write(msg);
+  term.write(msg as any);
   const result = oldPrompt(msg);
   term.writeln(" " + result);
   return result;
 };
-
-const editor = monaco.editor.create(document.querySelector("#editor")!, {
-  autoIndent: "full",
-  fontFamily: "Roboto Mono",
-  readOnly: false,
-  fontSize: 16,
-  minimap: {
-    enabled: false,
-  },
-  theme: darkMode ? "vs-dark" : "vs-light",
-  language: "coffeescript",
-});
 
 function maybeLoadCodeURL(url: URL) {
   if (!url.hash) return;
@@ -156,8 +198,6 @@ FOR EACH color IN colors {
   }
 }
 
-maybeLoadCodeURL(location as any);
-
 $buttons.run.addEventListener("click", run);
 $buttons.share.addEventListener("click", () => {
   window.location.hash = "code/" + btoa(editor.getValue());
@@ -165,14 +205,7 @@ $buttons.share.addEventListener("click", () => {
   // TODO: show breadcrumb
 });
 
-editor.addAction({
-  id: "aps.run",
-  label: "Run APScript",
-  keybindings: [
-    monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-  ],
-  run,
-});
+const markers: any[] = [];
 
 function run() {
   term.write("\r$ aps run <file>\r\n");
@@ -217,36 +250,11 @@ $overlay.addEventListener("click", (e) => {
   }
 });
 
-const markers: monaco.editor.IMarkerData[] = [];
-
-editor.onDidChangeModelContent(() => {
-  const errors = validate(editor.getValue());
-
-  markers.length = errors?.length ?? 0;
-  if (!errors) return;
-
-  for (let i = 0; i < errors.length; i++) {
-    const model = editor.getModel()!;
-    const start = model.getPositionAt(errors[i].labels[0].range.start);
-    const end = model.getPositionAt(errors[i].labels[0].range.end);
-    markers[i] = {
-      startLineNumber: start.lineNumber,
-      endLineNumber: end.lineNumber,
-      startColumn: start.column,
-      endColumn: end.column,
-      message: errors[i].message,
-      severity: i === 0
-        ? monaco.MarkerSeverity.Error
-        : monaco.MarkerSeverity.Info,
-    };
-  }
-
-  monaco.editor.setModelMarkers(editor.getModel()!, "owner", markers);
-});
-
-document.querySelectorAll("#overlay .content a").forEach((a) => {
-  a.addEventListener("click", () => {
-    maybeLoadCodeURL(new URL(a.href));
-    $overlay.classList.remove("showing");
-  });
-});
+document.querySelectorAll<HTMLAnchorElement>("#overlay .content a").forEach(
+  (a) => {
+    a.addEventListener("click", () => {
+      maybeLoadCodeURL(new URL(a.href));
+      $overlay.classList.remove("showing");
+    });
+  },
+);
