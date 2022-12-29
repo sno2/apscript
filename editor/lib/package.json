@@ -1,0 +1,12 @@
+{
+  "name": "aps_core",
+  "version": "0.1.0",
+  "files": [
+    "aps_core_bg.wasm",
+    "aps_core.js",
+    "aps_core.d.ts"
+  ],
+  "module": "aps_core.js",
+  "types": "aps_core.d.ts",
+  "sideEffects": false
+}
