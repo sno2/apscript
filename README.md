@@ -12,7 +12,7 @@ A speedy interpreter for the AP Computer Science Principles pseudocode language 
 
 ## Usage
 
-The interpreter is patched along with [a web playground](https://pseudocode.vercel.app/#examples/hello-world) using Monaco, the
+The interpreter is patched along with [a web playground](https://pseudocode.vercel.app) using Monaco, the
 text editor that powers VS Code, and term.js, an emulated terminal for the web.
 The interpreter supports live parse checking and runtime error diagnostics
 integrated into both the terminal and editor. Furthermore, the playground

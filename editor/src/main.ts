@@ -143,7 +143,9 @@ function maybeLoadCodeURL(url: URL) {
   if (url.hash.startsWith("#code/")) {
     try {
       editor.setValue(atob(url.hash.slice("#code/".length)));
-    } catch {}
+    } catch {
+      editor.setValue('DISPLAY("Hello, world!")');
+    }
   } else if (url.hash.startsWith("#examples/")) {
     const id = url.hash.slice("#examples/".length);
 
@@ -194,7 +196,7 @@ colors <- ["red", "green", "blue"]
 FOR EACH color IN colors {
 	DISPLAY(color)
 }`);
-    } else if (id === "hello-world") {
+    } else {
       editor.setValue('DISPLAY("Hello, world!")');
     }
   }
